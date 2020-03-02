@@ -64,13 +64,11 @@ def resolution_de_facon_graphique(fonction_1, fonction_2, x=sym.symbols("x")) ->
     x : SymPy symbol
         variable de l'équation à résoudre
     """
+    return None
 
 
 if __name__ == "__main__":
 
-
-
-    """
     x = sym.symbols("x")
     fonction_a_resoudre = -5*sym.exp(-x) + 5
     fonction_a_resoudre_derivee = 5*sym.exp(-x)
@@ -79,4 +77,3 @@ if __name__ == "__main__":
     print(f"Le résultat est :{resultat}")
     print(f"L'erreur sur le résultat est :{erreur}")
     print(f"Le nombre d'itération pour atteindre ce résultat :{nombre_iteration}")
-    """
