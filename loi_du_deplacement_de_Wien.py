@@ -1,7 +1,7 @@
-import numpy as n
+import numpy as np
 import sympy as sym
 import logging as log
-import matplotlib as mp
+import matplotlib.pyplot as plt
 
 
 def resolution_par_relaxation(fonction, point_initial: float, erreur_visee: float,
@@ -30,30 +30,32 @@ def resolution_par_relaxation(fonction, point_initial: float, erreur_visee: floa
     """
     x_0 = point_initial
     erreur = 9999999999999999999999999999
-    precision = 1 - int(n.log10(erreur_visee))
+    precision = 1 - int(np.log10(erreur_visee))
     iterator = 0
     if fonction_derivee is None:
         fonction_derivee = sym.diff(fonction, x)
 
     while erreur > erreur_visee:
         try:
-            x_0 = fonction.evalf(precision, {x: x_0})
-            erreur = fonction_derivee.evalf(2, {x: x_0})*erreur
-            iterator += 1
-            if fonction_derivee.evalf(2, {x: x_0}) > 1:
+            erreur = fonction_derivee.evalf(2, subs={x: x_0}) * erreur
+            if fonction_derivee.evalf(10, subs={x: x_0}) > 1.00000000000:
                 raise ValueError
+            x_0 = fonction.evalf(precision, subs={x: x_0})
+            iterator += 1
 
         except ValueError:
             log.error("La méthode ne converge pas puisque l'évaluation de la dérivée > 1")
-            return 0, 0, iterator
+            return 0, 0, 0
 
     return x_0, erreur, iterator
 
 
-def resolution_de_facon_graphique(fonction_1, fonction_2, x=sym.symbols("x")) -> None:
+def resolution_de_facon_graphique(fonction_1, fonction_2,debut_de_la_plage_d_affichage: int,
+                                  fin_de_la_plage_d_affichage: int, x=sym.symbols("x"),) -> None:
     """
     Cette méthode affiche les deux fonctions des deux côtés de l'équation
-    afin d'observer de façon graphique les résultats possibles de l'équation non-linéaire.
+    afin d'observer de façon graphique les résultats possibles de l'équation non-linéaire
+    pour la plage donnée en argument.
 
     Parameters
     ----------
@@ -61,19 +63,48 @@ def resolution_de_facon_graphique(fonction_1, fonction_2, x=sym.symbols("x")) ->
        fonction du côté gauche de l'équation
     fonction_2 :
         fonction du côté droit de l'équation
+    debut_de_la_plage_d_affichage :
+        Début de la plage
+    fin_de_la_plage_d_affichage : SymPy symbol
+        Fin de la plage
     x : SymPy symbol
         variable de l'équation à résoudre
     """
-    return None
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    nb_de_bonds = int((fin_de_la_plage_d_affichage - debut_de_la_plage_d_affichage)*10)
+    valeurs_de_x = np.linspace(debut_de_la_plage_d_affichage, fin_de_la_plage_d_affichage, nb_de_bonds)
+    f1 = sym.lambdify(x, fonction_1, "numpy")
+    f2 = sym.lambdify(x, fonction_2, "numpy")
+    ax.plot(valeurs_de_x, f1(valeurs_de_x), color='blue', lw=2)
+    ax.plot(valeurs_de_x, f2(valeurs_de_x), color='red', lw=2)
+    ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
+                 " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
+    ax.set_xlabel("Valeurs de x")
+    ax.set_ylabel("Valeurs de f(x) gauche et droite")
+
+    plt.grid()
+    plt.show()
+    plt.close(fig)
 
 
 if __name__ == "__main__":
-
+    # Code pour le b)
+    """
     x = sym.symbols("x")
     fonction_a_resoudre = -5*sym.exp(-x) + 5
     fonction_a_resoudre_derivee = 5*sym.exp(-x)
-    resultat, erreur, nombre_iteration = resolution_par_relaxation(fonction_a_resoudre, 2, 0.000001,
+    resultat, erreur, nombre_iteration = resolution_par_relaxation(fonction_a_resoudre, 40, 0.000001,
                                                                    fonction_a_resoudre_derivee)
     print(f"Le résultat est :{resultat}")
     print(f"L'erreur sur le résultat est :{erreur}")
     print(f"Le nombre d'itération pour atteindre ce résultat :{nombre_iteration}")
+    """
+
+    # Code pour le c)
+    """
+    x = sym.symbols("x")
+    fonction_a_droite = -5*sym.exp(-x) + 5
+    fonction_a_gauche = x
+    resolution_de_facon_graphique(fonction_a_droite, fonction_a_gauche, -1, 6)
+    """
