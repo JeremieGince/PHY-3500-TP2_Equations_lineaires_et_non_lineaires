@@ -61,11 +61,11 @@ def resolution_de_facon_graphique(fonction_1, fonction_2,debut_de_la_plage_d_aff
     ----------
     fonction_1 : SymPy object
        fonction du côté gauche de l'équation
-    fonction_2 :
+    fonction_2 : SymPy object
         fonction du côté droit de l'équation
     debut_de_la_plage_d_affichage :
         Début de la plage
-    fin_de_la_plage_d_affichage : SymPy symbol
+    fin_de_la_plage_d_affichage :
         Fin de la plage
     x : SymPy symbol
         variable de l'équation à résoudre
