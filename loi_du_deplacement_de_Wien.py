@@ -50,8 +50,8 @@ def resolution_par_relaxation(fonction, point_initial: float, erreur_visee: floa
     return x_0, erreur, iterator
 
 
-def resolution_de_facon_graphique(fonction_1, fonction_2,debut_de_la_plage_d_affichage: int,
-                                  fin_de_la_plage_d_affichage: int, x=sym.symbols("x"),) -> None:
+def resolution_de_facon_graphique(fonction_1, fonction_2, debut_de_la_plage_d_affichage: int,
+                                  fin_de_la_plage_d_affichage: int, x=sym.symbols("x"), ) -> None:
     """
     Cette méthode affiche les deux fonctions des deux côtés de l'équation
     afin d'observer de façon graphique les résultats possibles de l'équation non-linéaire
@@ -70,22 +70,26 @@ def resolution_de_facon_graphique(fonction_1, fonction_2,debut_de_la_plage_d_aff
     x : SymPy symbol
         variable de l'équation à résoudre
     """
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    nb_de_bonds = int((fin_de_la_plage_d_affichage - debut_de_la_plage_d_affichage)*10)
-    valeurs_de_x = np.linspace(debut_de_la_plage_d_affichage, fin_de_la_plage_d_affichage, nb_de_bonds)
-    f1 = sym.lambdify(x, fonction_1, "numpy")
-    f2 = sym.lambdify(x, fonction_2, "numpy")
-    ax.plot(valeurs_de_x, f1(valeurs_de_x), color='blue', lw=2)
-    ax.plot(valeurs_de_x, f2(valeurs_de_x), color='red', lw=2)
-    ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
-                 " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
-    ax.set_xlabel("Valeurs de x")
-    ax.set_ylabel("Valeurs de f(x) gauche et droite")
+    try:
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        nb_de_bonds = int((fin_de_la_plage_d_affichage - debut_de_la_plage_d_affichage) * 10)
+        valeurs_de_x = np.linspace(debut_de_la_plage_d_affichage, fin_de_la_plage_d_affichage, nb_de_bonds)
+        f1 = sym.lambdify(x, fonction_1, "numpy")
+        f2 = sym.lambdify(x, fonction_2, "numpy")
+        ax.plot(valeurs_de_x, f1(valeurs_de_x), color='blue', lw=2)
+        ax.plot(valeurs_de_x, f2(valeurs_de_x), color='red', lw=2)
+        ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
+                     " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
+        ax.set_xlabel("Valeurs de x")
+        ax.set_ylabel("Valeurs de f(x) gauche et droite")
 
-    plt.grid()
-    plt.show()
-    plt.close(fig)
+        plt.grid()
+        plt.show()
+        plt.close(fig)
+
+    except ZeroDivisionError:
+        log.error("Le domaine choisi engendre une division par zéro")
 
 
 if __name__ == "__main__":

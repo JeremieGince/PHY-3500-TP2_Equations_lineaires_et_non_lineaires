@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sym
+import logging as log
 
 
 def afficher_fonction_d_onde(potentiel: float, largeur_du_puit: float, masse: float, debut_de_la_plage_energie: float,
@@ -22,26 +23,30 @@ def afficher_fonction_d_onde(potentiel: float, largeur_du_puit: float, masse: fl
     fin_de_la_plage_energie :
         Fin de la plage
     """
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    # les plus ou moins 0.001 sont présent pour éviter les divisions par 0
-    nb_de_bonds = int((fin_de_la_plage_energie + 0.001 - debut_de_la_plage_energie - 0.001) * 10)
-    valeurs_de_x = np.linspace(debut_de_la_plage_energie + 0.001, fin_de_la_plage_energie - 0.001, nb_de_bonds)
-    c = 3e8  # m/s
-    h_bar = 6.582e-16  # eVs
-    fonction_1 = lambda x: np.tan(np.sqrt(((largeur_du_puit ** 2) * masse * x) / (2 * (c ** 2) * (h_bar ** 2))))
-    fonction_2 = lambda x: np.sqrt((potentiel - x) / x)
-    fonction_3 = lambda x: -np.sqrt(x / (potentiel - x))
-    ax.plot(valeurs_de_x, fonction_1(valeurs_de_x), color='blue', lw=2, label="y_1")
-    ax.plot(valeurs_de_x, fonction_2(valeurs_de_x), color='red', lw=2, label="y_2")
-    ax.plot(valeurs_de_x, fonction_3(valeurs_de_x), color='black', lw=2, label="y_3")
-    ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
-                 " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
-    ax.set_xlabel("Énergie [eV]")
-    ax.set_ylabel("Valur associé à la fonction [-]")
-    ax.legend()
-    plt.grid()
-    plt.show()
+    try:
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        # les plus ou moins 0.001 sont présent pour éviter les divisions par 0
+        nb_de_bonds = int((fin_de_la_plage_energie + 0.001 - debut_de_la_plage_energie - 0.001) * 10)
+        valeurs_de_x = np.linspace(debut_de_la_plage_energie + 0.001, fin_de_la_plage_energie - 0.001, nb_de_bonds)
+        c = 3e8  # m/s
+        h_bar = 6.582e-16  # eVs
+        fonction_1 = lambda x: np.tan(np.sqrt(((largeur_du_puit ** 2) * masse * x) / (2 * (c ** 2) * (h_bar ** 2))))
+        fonction_2 = lambda x: np.sqrt((potentiel - x) / x)
+        fonction_3 = lambda x: -np.sqrt(x / (potentiel - x))
+        ax.plot(valeurs_de_x, fonction_1(valeurs_de_x), color='blue', lw=2, label="y_1")
+        ax.plot(valeurs_de_x, fonction_2(valeurs_de_x), color='red', lw=2, label="y_2")
+        ax.plot(valeurs_de_x, fonction_3(valeurs_de_x), color='black', lw=2, label="y_3")
+        ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
+                     " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
+        ax.set_xlabel("Énergie [eV]")
+        ax.set_ylabel("Valur associé à la fonction [-]")
+        ax.legend()
+        plt.grid()
+        plt.show()
+
+    except ZeroDivisionError:
+        log.error("Le domaine choisi engendre une division par zéro")
 
 
 def resolution_par_bissection(fonction_gauche, fonction_droite, point_initial_gauche: float, point_initial_droit: float,
@@ -70,27 +75,43 @@ def resolution_par_bissection(fonction_gauche, fonction_droite, point_initial_ga
     x : SymPy symbol
         variable de l'équation à résoudre
     """
-    nombre_iteration_pour_erreur = float(np.log2((point_initial_droit - point_initial_gauche) / erreur_visee))
-    # Le moins 0.000001 est la pour s'assurer que si le résultat de nombre_iteration_pour_erreur
-    # est un nombre entier, que le nombre d'itération soit ce nombre et non ce nombre plus 1
-    nombre_iteration = int(float(nombre_iteration_pour_erreur) - 0.0000001) + 1
-    erreur_global = (point_initial_droit - point_initial_gauche) / (2 ** nombre_iteration)
     nombre_de_decimal = int(-np.log10(erreur_visee) + 2)
-    for i in range(nombre_iteration):
-        # On vérifie que les deux points sont de part et d'autre d'un intersection
+    try:
         f_g_moins_f_d_point_gauche = (fonction_gauche.evalf(nombre_de_decimal, subs={x: point_initial_gauche})
                                       - fonction_droite.evalf(nombre_de_decimal, subs={x: point_initial_gauche}))
         f_g_moins_f_d_point_droit = (fonction_gauche.evalf(nombre_de_decimal, subs={x: point_initial_droit})
                                      - fonction_droite.evalf(nombre_de_decimal, subs={x: point_initial_droit}))
-        point_centrale = (point_initial_droit + point_initial_gauche) / 2
         if f_g_moins_f_d_point_gauche * f_g_moins_f_d_point_droit > 0:
-            point_initial_gauche = point_centrale
+            raise ValueError
+
+        nombre_iteration_pour_erreur = float(np.log2((point_initial_droit - point_initial_gauche) / erreur_visee))
+        # Le moins 0.000001 est la pour s'assurer que si le résultat de nombre_iteration_pour_erreur
+        # est un nombre entier, que le nombre d'itération soit ce nombre et non ce nombre plus 1
+        nombre_iteration = int(float(nombre_iteration_pour_erreur) - 0.0000001) + 1
+        erreur_global = (point_initial_droit - point_initial_gauche) / (2 ** nombre_iteration)
+
+        for i in range(nombre_iteration):
+            # On vérifie que les deux points sont de part et d'autre d'un intersection
+            f_g_moins_f_d_point_gauche = (fonction_gauche.evalf(nombre_de_decimal, subs={x: point_initial_gauche})
+                                      - fonction_droite.evalf(nombre_de_decimal, subs={x: point_initial_gauche}))
+            f_g_moins_f_d_point_droit = (fonction_gauche.evalf(nombre_de_decimal, subs={x: point_initial_droit})
+                                     - fonction_droite.evalf(nombre_de_decimal, subs={x: point_initial_droit}))
+            point_centrale = (point_initial_droit + point_initial_gauche) / 2
+            if f_g_moins_f_d_point_gauche * f_g_moins_f_d_point_droit > 0:
+                point_initial_gauche = point_centrale
+            else:
+                point_initial_droit = point_centrale
+
+        point_centrale_finale = (point_initial_droit + point_initial_gauche) / 2
+
+        return point_centrale_finale, erreur_global, nombre_iteration
+
+    except (ValueError, ZeroDivisionError) as e:
+        if e is ValueError:
+            log.error("Les deux points initiales ne sont pas de par et d'autre d'une intersection")
         else:
-            point_initial_droit = point_centrale
-
-    point_centrale_finale = (point_initial_droit + point_initial_gauche) / 2
-
-    return point_centrale_finale, erreur_global, nombre_iteration
+            log.error("Il y a eu une division par zero lors de l'évaluation de la fonction.")
+        return 0, 0, 0
 
 
 if __name__ == "__main__":
@@ -121,10 +142,12 @@ if __name__ == "__main__":
     liste_reslutats.append([point_3, erreur_3, nb_iteration_3])
     point_4, erreur_4, nb_iteration_4 = resolution_par_bissection(y_1, y_3, 0.5, 2.5, 0.001, E)
     liste_reslutats.append([point_4, erreur_4, nb_iteration_4])
-    point_5, erreur_5, nb_iteration_5 = resolution_par_bissection(y_1, y_3, 10, 17, 0.001, E)
+    point_5, erreur_5, nb_iteration_5 = resolution_par_bissection(y_1, y_3, 4, 7, 0.001, E)
     liste_reslutats.append([point_5, erreur_5, nb_iteration_5])
-    point_6, erreur_6, nb_iteration_6 = resolution_par_bissection(y_1, y_3, 18.8, 19.9, 0.001, E)
+    point_6, erreur_6, nb_iteration_6 = resolution_par_bissection(y_1, y_3, 10, 17, 0.001, E)
     liste_reslutats.append([point_6, erreur_6, nb_iteration_6])
+    point_7, erreur_7, nb_iteration_7 = resolution_par_bissection(y_1, y_3, 18.8, 19.9, 0.001, E)
+    liste_reslutats.append([point_7, erreur_7, nb_iteration_7])
     iterateur = 0
     # les trois premiers points correspondent aux points de y_1 avec y_2
     # tandis que les trois derniers correspondent aux points de y_1 avec y_3
