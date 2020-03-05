@@ -98,7 +98,7 @@ def somme_de_projections_vectoriels_sur_colonnes_de_matrice(vecteur_projete: np.
 
 
 def decomposition_matricielle_valeurs_propres_et_vecteurs_prpres(matrice: np.ndarray,
-                                                    valeur_max_tolere_non_diagonale: float) -> (list, list, int, float):
+                                                                 valeur_max_tolere_non_diagonale: float) -> (list, list, int, float):
     """
     Cette méthode décompose une matrice réel carré en une matrice diagonale contenant les valeurs propres
     de la matrice et une matrice composé de vecteurs orthonormaux propres à la matrice.
@@ -115,7 +115,7 @@ def decomposition_matricielle_valeurs_propres_et_vecteurs_prpres(matrice: np.nda
     ----------
     matrice_diag:
         La matrice diagonalisé
-    V:
+    v:
         Matrice contenant les vecteurs propres associés aux valeurs propres
     iterateur:
         Indice pour savoir le nombre d'itération requise pour produire le résultat
@@ -123,16 +123,16 @@ def decomposition_matricielle_valeurs_propres_et_vecteurs_prpres(matrice: np.nda
         Différence moyenne des éléments non diagonales par rapport à 0 représente l'erreur sur les résultat données
     """
     matrice_diag = matrice
-    V = np.identity(4)
+    v = np.identity(4)
     diag_mask = (np.zeros((len(matrice), len(matrice))) + np.diag(np.ones(len(matrice)))).astype(np.bool)
     iterateur = 0
-    while np.amax(np.ma.masked_where(diag_mask, matrice_diag)) >= valeur_max_tolere_non_diagonale:
+    while np.amax(np.abs(np.ma.masked_where(diag_mask, matrice_diag))) >= valeur_max_tolere_non_diagonale:
         iterateur += 1
-        Q, R = decomposition_matriciel_qr(matrice_diag)
-        matrice_diag = R @ Q
-        V = V @ Q
+        q, r = decomposition_matriciel_qr(matrice_diag)
+        matrice_diag = r @ q
+        v = v @ q
     erreur = np.abs(np.ma.masked_where(diag_mask, matrice_diag)).mean()
-    return matrice_diag, V, iterateur, erreur
+    return matrice_diag, v, iterateur, erreur
 
 
 if __name__ == "__main__":
@@ -146,10 +146,20 @@ if __name__ == "__main__":
     produit = np.matmul(matriceQ,matriceR)
     print(f"Matrice QR:{produit}")
     """
+    # code pour la question b)
     matriceA = np.array([[1, 4, 8, 4], [4, 2, 3, 7], [8, 3, 6, 9], [4, 7, 9, 2]], float)
-    matrice_diag, V, iterateur, erreur = decomposition_matricielle_valeurs_propres_et_vecteurs_prpres(matriceA,
-                                                                                                      0.000001)
-    print(matrice_diag)
-    print(V)
-    print(iterateur)
-    print(erreur)
+    for valeur_max in [1e-4, 1e-6, 1e-12, 1e-18]:
+        matrice_diagonal, matrice_vecteurs, iteration, erreur_sur_resultat = decomposition_matricielle_valeurs_propres_et_vecteurs_prpres(matriceA, valeur_max)
+        dimension = len(matrice_diagonal)
+        liste_valeur_propres = []
+        liste_vecteur_propres = []
+        for j in range(dimension):
+            liste_valeur_propres.append(matrice_diagonal[j, j])
+            liste_vecteur_propres.append(matrice_vecteurs[:, j])
+        print("-----------------------------")
+        print(f"Dans le cas d'une valeur max de {valeur_max}")
+        print(f"Voici la matrice qui est supposé être diagonale: {matrice_diagonal}")
+        print(f"La liste des valeurs propres est: {liste_valeur_propres}")
+        print(f"La liste des vecteurs propres est: {liste_vecteur_propres}")
+        print(f"Le nombre d'itération requis est: {iteration}")
+        print(f"L'erreur sur les résultats est de: {erreur_sur_resultat}")
