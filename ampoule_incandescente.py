@@ -15,25 +15,43 @@ class MathFunction:
 
     def __init__(self, func):
         """
-        Constructeur de la class MathFunction.
-        :param func: Fontion mathématique. (Function or lambda expression)
+        constructeur
+
+        Parameters
+        ----------
+        func :
+           fonction mathématique (fonction ou lambda expression)
         """
         self.function = func
 
     def __call__(self, *args):
         """
-        Call de la fonction mathématique courante.
-        :param args: arguments de la fonction courante.
-        :return: return de self.function(*args)
+        Cette fonction évalue tout simplement la fonction
+
+        Return
+        ----------
+        Résultat de l'appel de la fonction
         """
+
         return self.function(*args)
 
     def gaussxq(self, N: int) -> (float, float):
         """
-        A faire
+        Cette methode affiche trois différentes formes de fonction d'onde
+        pour un puit de potentiiel rectangulaire pour la plage spécifiée.
 
-        :param N:
-        :return:
+        Parameters
+        ----------
+        N :
+           Correspond au nombre de sous intervalle de l'intégrale
+
+        Returns
+        ----------
+        x:
+            les racines
+        w:
+            le poid de chaque racines
+
         """
         # Approximation initial des racines des polynomes de Legendre
         a = np.linspace(3, 4 * N - 1, N)/(4 * N + 2)
@@ -59,6 +77,23 @@ class MathFunction:
         return x, w
 
     def gaussian_quadrature_integration(self, **kwargs) -> float:
+        """
+        Cette méthode évalue par quadrature l'intégrale bornée de la
+        fonction
+
+        Parameters
+        ----------
+        kwargs:
+            bounds : list
+                Correespond aux bornes de l'intégrale
+            N: int
+                Correspond au nombre de sous intervalle de l'intégrale
+
+        Returns
+        ----------
+        s:
+            le résultat de l'intégrale définie
+        """
         # P.170 Computational physics
         assert "bounds" in kwargs and "N" in kwargs
         bounds = kwargs["bounds"]
@@ -81,10 +116,9 @@ class MathFunction:
         return s
 
     def afficher_fonction(self, debut_de_la_plage: float, fin_de_la_plage: float, titre: str ,
-                          axe_x_name: str, axe_y_name: str, nb_de_points_dans_la_plage) -> None:
+                          axe_x_name: str, axe_y_name: str, nb_de_points_dans_la_plage: int) -> None:
         """
-        Cette methode affiche trois différentes formes de fonction d'onde
-        pour un puit de potentiiel rectangulaire pour la plage spécifiée.
+        Cette methode affiche la fonction sur une plage spécifiée.
 
         Parameters
         ----------
@@ -98,6 +132,8 @@ class MathFunction:
             Titre de l'axe des x
         axe_y_name :
             Titre de l'axe des y
+        nb_de_points_dans_la_plage:
+            nombre d'évaluation pour générer la courbe sur tout l'intervalle
         """
         try:
             fig = plt.figure()
@@ -126,16 +162,18 @@ class MathFunction:
 
         Parameters
         ----------
-        debut_de_la_plage :
-            Début de la plage pour l'affichage
-        fin_de_la_plage :
-            Fin de la plage pour l'affichage
-        titre :
-            Titre du graphique a afficher
-        axe_x_name :
-            Titre de l'axe des x
-        axe_y_name :
-            Titre de l'axe des y
+        valeur_initiale_gauche :
+            Valeur initiale à gauche pour débuter l'algorithme
+        valeur_initiale_droite :
+            Valeur initiale à gauche pour débuter l'algorithme
+        erreur_vise :
+            erreur qui arr^te l'algorithme lorsqu'elle est atteinte
+
+        Returns
+        ---------
+        point_maximal:
+            Valeur de l'abcisse correspondant au max de la fonction entre les
+            deux valeurs initiales.
         """
         assert valeur_initiale_gauche < valeur_initiale_droite
         nombre_d_or = (1 + np.sqrt(5)) / 2
@@ -149,7 +187,8 @@ class MathFunction:
                 valeur_initiale_droite, position_a = position_a, position_b
                 position_b = valeur_initiale_gauche - (valeur_initiale_droite - valeur_initiale_gauche) / nombre_d_or
 
-        return (valeur_initiale_droite + valeur_initiale_gauche) / 2
+        point_maximal = (valeur_initiale_droite + valeur_initiale_gauche) / 2
+        return point_maximal
 
 
 if __name__ == "__main__":
