@@ -98,7 +98,7 @@ def somme_de_projections_vectoriels_sur_colonnes_de_matrice(vecteur_projete: np.
 
 
 def decomposition_matricielle_valeurs_propres_et_vecteurs_propres(matrice: np.ndarray,
-                                                                 valeur_max_tolere_non_diagonale: float) -> (list, list, int, float):
+                                                    valeur_max_tolere_non_diagonale: float) -> (list, list, int, float):
     """
     Cette méthode décompose une matrice réel carré en une matrice diagonale contenant les valeurs propres
     de la matrice et une matrice composé de vecteurs orthonormaux propres à la matrice.

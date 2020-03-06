@@ -1,4 +1,7 @@
 import numpy as np
+import logging as log
+import matplotlib.pyplot as plt
+import scipy.constants as const
 
 
 class MathFunction:
@@ -114,14 +117,51 @@ class MathFunction:
         kwargs["N"] = N
         return self.gaussian_quadrature_integration(**kwargs), error
 
+    def afficher_fonction(self, debut_de_la_plage: float, fin_de_la_plage: float, titre: str ,
+                          axe_x_name: str, axe_y_name: str, nb_de_points_dans_la_plage) -> None:
+        """
+        Cette methode affiche trois différentes formes de fonction d'onde
+        pour un puit de potentiiel rectangulaire pour la plage spécifiée.
+
+        Parameters
+        ----------
+        debut_de_la_plage :
+            Début de la plage pour l'affichage
+        fin_de_la_plage :
+            Fin de la plage pour l'affichage
+        titre :
+            Titre du graphique a afficher
+        axe_x_name :
+            Titre de l'axe des x
+        axe_y_name :
+            Titre de l'axe des y
+        """
+        try:
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            nb_de_bonds = nb_de_points_dans_la_plage
+            valeurs_de_x = np.linspace(debut_de_la_plage, fin_de_la_plage, nb_de_bonds)
+            valeurs_de_y =[]
+            for element in np.nditer(valeurs_de_x):
+                valeurs_de_y.append(self(element))
+
+            valeurs_de_y = np.asarray(valeurs_de_y)
+            ax.plot(valeurs_de_x, valeurs_de_y, color='blue', lw=2, label="y_1")
+            ax.set_title(titre)
+            ax.set_xlabel(axe_x_name)
+            ax.set_ylabel(axe_y_name)
+            plt.grid()
+            plt.show()
+        except ZeroDivisionError:
+            log.error("L'évaluation de la fonction dans la plage cause une division par 0")
+
 
 if __name__ == "__main__":
-
-    def fonction(x):
-        return x
-
-    math = MathFunction(fonction)
-    print(type(math.gaussian_quadrature_integration(bounds=[2, 3], N=100)))
-
-
-
+    fonction_a_integrer = MathFunction(lambda x: (15/(np.pi**2))*((x**3)/((np.e**x) - 1)))
+    borne_inferieur = (const.h*const.c)/((750e-9)*const.Boltzmann)  # Le T au dénominateur va apparaitre dans la fonction lambda
+    borne_superieur = (const.h*const.c)/((300e-9)*const.Boltzmann)  # Le T au dénominateur va apparaitre dans la fonction lambda
+    fonction_a_afficher = MathFunction(lambda x: fonction_a_integrer.gaussian_quadrature_integration(N=100,
+                                                                        bounds=[borne_inferieur/x, borne_superieur/x]))
+    fonction_a_afficher.afficher_fonction(300, 10000,
+                                          "Éfficacité de l'ampoule incandescente en fonction de sa température",
+                                          "Température [k]", "Efficacité", 100)

@@ -24,7 +24,7 @@ def resolution_par_relaxation(fonction, point_initial: float, erreur_visee: floa
         de l'équation
     fonction_derivee : SymPy object
         f'(x) pourcalculer l'évolution de l'erreur sur le résultat. Si ce paramètre
-        n'est pas remplis, la fonction f(x) sera dérivé à l'aide de sympy
+        n'est pas remplis, la fonction f(x) sera dérivée à l'aide de sympy
     x : SymPy symbol
         variable de l'équation à résoudre
     """
@@ -79,8 +79,8 @@ def resolution_de_facon_graphique(fonction_1, fonction_2, debut_de_la_plage_d_af
         f2 = sym.lambdify(x, fonction_2, "numpy")
         ax.plot(valeurs_de_x, f1(valeurs_de_x), color='blue', lw=2)
         ax.plot(valeurs_de_x, f2(valeurs_de_x), color='red', lw=2)
-        ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
-                     " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
+        ax.set_title("Graphique illustrant les résultats de l'équation correspondante\n"
+                     " aux intersections entre les fonctions de gauche et de droite de\n l'équation.")
         ax.set_xlabel("Valeurs de x")
         ax.set_ylabel("Valeurs de f(x) gauche et droite")
 
