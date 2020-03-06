@@ -40,7 +40,7 @@ def afficher_fonction_d_onde(potentiel: float, largeur_du_puit: float, masse: fl
         ax.set_title("Graphique illustrant les résultats de l'équation correspondant\n"
                      " aux intersection entre les fonction de gauche et de droite de\n l'équation.")
         ax.set_xlabel("Énergie [eV]")
-        ax.set_ylabel("Valur associé à la fonction [-]")
+        ax.set_ylabel("Valeur associée à la fonction [-]")
         ax.legend()
         plt.grid()
         plt.show()
@@ -75,6 +75,7 @@ def resolution_par_bissection(fonction_gauche, fonction_droite, point_initial_ga
     x : SymPy symbol
         variable de l'équation à résoudre
     """
+    assert point_initial_gauche < point_initial_droit
     nombre_de_decimal = int(-np.log10(erreur_visee) + 2)
     try:
         f_g_moins_f_d_point_gauche = (fonction_gauche.evalf(nombre_de_decimal, subs={x: point_initial_gauche})

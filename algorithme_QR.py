@@ -165,3 +165,11 @@ if __name__ == "__main__":
         print(f"Le nombre d'itération requis est: {iteration}")
         print(f"L'erreur sur les résultats est de: {erreur_sur_resultat}")
     """
+    # code pour la référence de la question c)
+    """
+    matriceA = np.array([[1, 4, 8, 4], [4, 2, 3, 7], [8, 3, 6, 9], [4, 7, 9, 2]], float)
+    valeurs_propres, vecteurs_propres = np.linalg.eig(matriceA)
+    print("Voici les résultats de numpy")
+    print(f"Les valeurs propres de la matrice sont: {valeurs_propres}")
+    print(f"Les vecteurs propres de la matrice sont: {vecteurs_propres}")
+    """
